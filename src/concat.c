@@ -82,7 +82,9 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             display_version();
-            printf("\nWhy don't scientists trust atoms? Because they make up everything!\n");
+            printf("\nConcat (v1.0) was created and developed by Cyril John Magayaga\n");
+            printf("\nCopyright (c) 2023 Cyril John Magayaga");
+            printf("\nTagline: Why don't scientists trust atoms? Because they make up everything!\n");
             return 0;
         }
     }
