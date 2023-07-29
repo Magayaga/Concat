@@ -23,3 +23,6 @@ $ ./concat README.md
 $ ./concat -n examples/a.txt examples/b.txt
 
 ```
+
+### Copyright
+Copyright (c) Cyril John Magayaga. All rights reserved.
