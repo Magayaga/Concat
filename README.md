@@ -1,21 +1,25 @@
-# `cat`
+# `concat` / Concatenare
 
-`cat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga).
+`concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga).
 
 ## Getting Start
 
 ### Windows, Linux, and Unix
 ```shell
 # Download the Cat command
-$ git clone https://github.com/Magayaga/Cat.git
+$ git clone https://github.com/Magayaga/Concat.git
 
 # Change the directory the Cat
-$ cd Cat
+$ cd Concat
 
-# Run the program
-$ gcc src/cat.c -o cat.c
+# Run the program (gcc)
+$ gcc src/concat.c -o concat.c
+
+# or (make)
+$ make
 
 # Open the application
-$ ./cat README.md
+$ ./concat README.md
+$ ./concat -n examples/a.txt examples/b.txt
 
 ```
