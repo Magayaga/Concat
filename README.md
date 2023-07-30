@@ -6,10 +6,10 @@
 
 ### Windows, Linux, and Unix
 ```shell
-# Download the Cat command
+# Download the Concat command
 $ git clone https://github.com/Magayaga/Concat.git
 
-# Change the directory the Cat
+# Change the directory of the Concat
 $ cd Concat
 
 # Run the program (gcc)
