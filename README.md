@@ -1,6 +1,6 @@
 # `concat` / Concatenare
 
-`concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga).
+`concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga) and written in **C**. The [`type`](https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/administration/windows-commands/type.md) for Microsoft Windows and DOS operating systems and [`cat`](https://github.com/coreutils/coreutils/blob/master/src/cat.c) for Linux and Unix operating systems.
 
 ## Getting Start
 
@@ -20,9 +20,18 @@ $ make
 
 # Open the application
 $ ./concat README.md
-$ ./concat -n examples/a.txt examples/b.txt
 
 ```
 
-### Copyright
+## Examples
+```shell
+$ ./concat examples/a.txt examples/b.txt
+
+$ ./concat -A examples/a.txt examples/b.txt
+
+$ ./concat examples/a.txt > examples/c.txt
+
+```
+
+## Copyright
 Copyright (c) Cyril John Magayaga. All rights reserved.

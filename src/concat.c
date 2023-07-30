@@ -2,11 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "color.c"
 
 void print_file(const char* filename, int show_line_numbers, int number_nonblank, int show_nonprinting, int show_tabs, int case_insensitive) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Error: Unable to open file '%s'\n", filename);
+        red();
+        printf("Error: ");
+        resetColor();
+        yellow();
+        printf("Unable to open file (%s)\n", filename);
+        resetColor();
         return;
     }
 
@@ -53,11 +59,18 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
 }
 
 void display_version() {
-    printf("Cat Command Version 1.3\n");
+    blue();
+    printf("Concat command (v1.0.1)\n");
+    resetColor();
 }
 
 void display_help() {
-    printf("Usage: cat [OPTION]... [FILE]...\n");
+    yellow();
+    printf("Usage: ");
+    resetColor();
+    white();
+    printf("Usage: [OPTION]... [FILE]...\n");
+    resetColor();
     printf("Concatenate FILE(s) and display the content on the standard output.\n\n");
     printf("  -A, --show-all            equivalent to -vET\n");
     printf("  -b, --number-nonblank     number nonempty output lines, overrides -n\n");
@@ -72,7 +85,13 @@ void display_help() {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        printf("Usage: %s [OPTION]... [FILE]...\n", argv[0]);
+
+         yellow();
+         printf("Usage: ");
+         resetColor();
+         white();
+         printf("Usage: [OPTION]... [FILE]...\n", argv[0]);
+         resetColor();
         return 1;
     }
 
@@ -82,9 +101,13 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             display_version();
-            printf("\nConcat (v1.0) was created and developed by Cyril John Magayaga\n");
+            blue();
+            printf("\nConcat (v1.0.1) was created and developed by Cyril John Magayaga\n");
+            resetColor();
             printf("\nCopyright (c) 2023 Cyril John Magayaga");
+            white();
             printf("\nTagline: Why don't scientists trust atoms? Because they make up everything!\n");
+            resetColor();
             return 0;
         }
     }
@@ -112,14 +135,24 @@ int main(int argc, char* argv[]) {
             show_nonprinting = 1;
         } else if (strcmp(argv[i], ">") == 0) {
             if (i + 1 >= argc) {
-                printf("Error: Missing filename after '>'.\n");
+                red();
+                printf("Error: ");
+                resetColor();
+                yellow();
+                printf("Missing filename after '>'.\n");
+                resetColor();
                 return 1;
             }
             freopen(argv[i + 1], "w", stdout);
             i++;
         } else if (strcmp(argv[i], ">>") == 0) {
             if (i + 1 >= argc) {
-                printf("Error: Missing filename after '>>'.\n");
+                red();
+                printf("Error: ");
+                resetColor();
+                yellow();
+                printf("Missing filename after '>>'.\n");
+                resetColor();
                 return 1;
             }
             freopen(argv[i + 1], "a", stdout);
