@@ -13,7 +13,7 @@ $ git clone https://github.com/Magayaga/Concat.git
 $ cd Concat
 
 # Run the program (gcc)
-$ gcc src/concat.c -o concat.c
+$ gcc src/concat.c -o concat.exe
 
 # or (make)
 $ make
