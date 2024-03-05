@@ -2,6 +2,7 @@
 
 `concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga) and written in **C**. The [`type`](https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/administration/windows-commands/type.md) for Microsoft Windows and DOS operating systems and [`cat`](https://github.com/coreutils/coreutils/blob/master/src/cat.c) for Linux and Unix operating systems.
 
+`type` + `cat` = `concat` is the new modern concatenate files!
 ## Getting Start
 
 ### Windows, Linux, and Unix
@@ -13,7 +14,7 @@ $ git clone https://github.com/Magayaga/Concat.git
 $ cd Concat
 
 # Run the program (gcc)
-$ gcc src/concat.c -o concat.exe
+$ gcc src/concat.c -o concat
 
 # or (make)
 $ make
@@ -34,4 +35,4 @@ $ ./concat examples/a.txt > examples/c.txt
 ```
 
 ## Copyright
-Copyright (c) Cyril John Magayaga. All rights reserved.
+Copyright (c) 2023 - 2024 Cyril John Magayaga. All rights reserved.
