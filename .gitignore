@@ -1,0 +1,41 @@
+# prerequisites
+*.d
+
+# object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# linker output
+*.ilk
+*.map
+*.exp
+
+# precompiled headers
+*.gch
+*.pch
+
+# libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# executables
+*.exe
+*.exe~
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# test binary
+*.test
