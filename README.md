@@ -1,8 +1,8 @@
-# `concat` / Concatenare
+# `concat`
 
-`concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga) and written in **C**. The [`type`](https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/administration/windows-commands/type.md) for Microsoft Windows and DOS operating systems and [`cat`](https://github.com/coreutils/coreutils/blob/master/src/cat.c) for Linux and Unix operating systems.
+`concat` command in Windows, Linux, and Unix operating systems is primarily used to display the contents of a file on the terminal. It was developed by [Cyril John Magayaga](https://github.com/magayaga) and written in **C**. The [`type`](https://github.com/MicrosoftDocs/windowsserverdocs/blob/main/WindowsServerDocs/administration/windows-commands/type.md) for Microsoft Windows and DOS operating systems and [`cat`](https://github.com/coreutils/coreutils/blob/master/src/cat.c) and [`nl`](https://github.com/coreutils/coreutils/blob/master/src/nl.c) for Linux and Unix operating systems.
 
-`type` + `cat` = `concat` is the new modern concatenate files!
+`type` (Windows-based concatenare files) + `cat` (Unix-based concatenare files)  + `nl` (Unix-based numbering lines) = `concat` is the new modern concatenate files!
 ## Getting Start
 
 ### Windows, Linux, and Unix
@@ -13,8 +13,8 @@ $ git clone https://github.com/Magayaga/Concat.git
 # Change the directory of the Concat
 $ cd Concat
 
-# Run the program (gcc)
-$ gcc src/concat.c -o concat
+# Run the program (batchfile)
+$ ./make
 
 # or (make)
 $ make
@@ -31,6 +31,8 @@ $ ./concat examples/a.txt examples/b.txt
 $ ./concat -A examples/a.txt examples/b.txt
 
 $ ./concat examples/a.txt > examples/c.txt
+
+$ ./concat --nl examples/a.txt
 
 ```
 
