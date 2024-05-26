@@ -179,7 +179,6 @@ int main(int argc, char* argv[]) {
         }
 	
 	else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
-            display_version();
             blue();
             printf("\nConcat (v1.1.1) was created and developed by Cyril John Magayaga\n");
             resetColor();
