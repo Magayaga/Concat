@@ -26,13 +26,16 @@ $ ./concat README.md
 
 ## Examples
 ```shell
+# Concatenate files
 $ ./concat examples/a.txt examples/b.txt
-
 $ ./concat -A examples/a.txt examples/b.txt
-
 $ ./concat examples/a.txt > examples/c.txt
 
+# Numbering lines
 $ ./concat --nl examples/a.txt
+
+# REPL mode
+$ ./concat --repl
 
 ```
 
