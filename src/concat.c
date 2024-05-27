@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <dirent.h>
 #include "color.h"
 
 // Program name
@@ -129,8 +130,10 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
 
 void display_version() {
     blue();
-    printf("%s command (%s)\n", PROGRAM_NAME, VERSION);
+    printf("%s (%s) was created and developed by %s\n", PROGRAM_NAME, VERSION, AUTHORS);
     resetColor();
+    printf("\nCopyright (c) 2023-2024 %s", AUTHORS);
+    printf("\nTagline: Command-based utility that reads files sequentially, writing them to standard output!\n");
 }
 
 void display_help() {
@@ -138,24 +141,81 @@ void display_help() {
     printf("Usage: ");
     resetColor();
     printf("%s [OPTION]... [FILE]...\n", PROGRAM_NAME);
-    printf("Concatenate FILE(s) and display the content on the standard output.\n\n");
-    printf("  -A, --show-all                         equivalent to -e -t -n\n");
-    printf("  -b, --number-nonblank                  number nonempty output lines, overrides -n\n");
-    printf("  -e                                     display non-printing characters with $ at the end of each line\n");
-    printf("  -n, --number                           number all output lines\n");
-    printf("  -t                                     display TAB characters as ^I\n");
+    printf("Concatenate FILE(s), Numbering LINE(s), and display the content on the standard output.\n\n");
+    printf("  -A,  --show-all                        Equivalent to -e -t -n\n");
+    printf("  -b,  --number-nonblank                 Number nonempty output lines, overrides -n\n");
+    printf("  -e                                     Display non-printing characters with $ at the end of each line\n");
+    printf("  -n,  --number                          Number all output lines\n");
+    printf("  -t                                     Display TAB characters as ^I\n");
     printf("  -u                                     (ignored)\n");
-    printf("      --show-nonprinting                 show non-printing characters (use escape sequences)\n");
-    printf("  -v, --version                          display version information and a joke\n");
-    printf("      --help                             display this help and exit\n");
-    printf("      --nl                               number lines like the nl command with additional options:\n");
-    printf("           -b, --body-numbering          specify numbering for body (default: t, a, n)\n");
-    printf("           -h, --header-numbering        specify numbering for header (default: a, n)\n");
-    printf("           -f, --footer-numbering        specify numbering for footer (default: a, n)\n");
-    printf("           -i, --join-blank-lines        specify the number of blank lines to be joined\n");
-    printf("           -l, --line-number-interval    specify the interval between line numbers\n");
-    printf("           -s, --number-separator        specify the separator to use between line numbers and lines\n");
-    printf("           -w, --line-number-width       specify the width of the line numbers\n");
+    printf("       --show-nonprinting                Show non-printing characters (use escape sequences)\n");
+    printf("  -v,  --version                         Display version information\n");
+    printf("  -dv, --dumpversion                     Display the version of the compiler\n");
+    printf("      --help                             Display this help and exit\n");
+    printf("      --nl                               Number lines like the nl command with additional options:\n");
+    printf("           -b, --body-numbering          Specify numbering for body (default: t, a, n)\n");
+    printf("           -h, --header-numbering        Specify numbering for header (default: a, n)\n");
+    printf("           -f, --footer-numbering        Specify numbering for footer (default: a, n)\n");
+    printf("           -i, --join-blank-lines        Specify the number of blank lines to be joined\n");
+    printf("           -l, --line-number-interval    Specify the interval between line numbers\n");
+    printf("           -s, --number-separator        Specify the separator to use between line numbers and lines\n");
+    printf("           -w, --line-number-width       Specify the width of the line numbers\n");
+    printf("      --repl                             enter REPL (Read-Eval-Print Loop) mode\n");
+    printf("For bug reporting instructions, please see: ");
+    blue();
+    printf("<https://github.com/magayaga/concat>");
+    resetColor();
+    printf("\n");
+}
+
+void repl() {
+    printf("Entering REPL (Read-Eval-Print Loop) mode. Type 'exit' to leave.\n");
+    char command[1024];
+
+    while (true) {
+        printf("concat >> ");
+        if (fgets(command, sizeof(command), stdin) == NULL) {
+            break;
+        }
+
+        // Remove newline character at the end if present
+        size_t len = strlen(command);
+        if (len > 0 && command[len - 1] == '\n') {
+            command[len - 1] = '\0';
+        }
+
+        if (strcmp(command, "exit") == 0) {
+            break;
+        }
+
+        // Split command into arguments
+        char* argv[100];
+        int argc = 0;
+        char* token = strtok(command, " ");
+        while (token != NULL && argc < 100) {
+            argv[argc++] = token;
+            token = strtok(NULL, " ");
+        }
+
+        // Handle the command as if it were given on the command line
+        for (int i = 0; i < argc; i++) {
+            if (strcmp(argv[i], "--help") == 0) {
+                display_help();
+            }
+            
+            else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+                display_version();
+            }
+            
+            else if (argv[i][0] != '-') {
+                print_file(argv[i], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "\t", 6);
+            }
+            
+            else {
+                printf("Unknown command: %s\n", argv[i]);
+            }
+        }
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -188,11 +248,14 @@ int main(int argc, char* argv[]) {
         }
         
         else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+            display_version();
+            return 0;
+        }
+
+        else if (strcmp(argv[i], "--dumpversion") == 0 || strcmp(argv[i], "-dv") == 0) {
             blue();
-            printf("%s (%s) was created and developed by %s\n", PROGRAM_NAME, VERSION, AUTHORS);
+            printf("%s\n", VERSION);
             resetColor();
-            printf("\nCopyright (c) 2023-2024 %s", AUTHORS);
-            printf("\nTagline: Command-based utility that reads files sequentially, writing them to standard output!\n");
             return 0;
         }
         
@@ -305,6 +368,11 @@ int main(int argc, char* argv[]) {
             if (++i < argc) {
                 line_number_width = atoi(argv[i]);
             }
+        }
+
+        else if (strcmp(argv[i], "--repl") == 0) {
+            repl();
+            return 0;
         }
         
         else if (strcmp(argv[i], ">") == 0) {
