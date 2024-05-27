@@ -4,6 +4,15 @@
 #include <stdbool.h>
 #include "color.h"
 
+// Program name
+#define PROGRAM_NAME "concat"
+
+// Version
+#define VERSION "v1.1.1"
+
+// Cyril John Magayaga is the original author of Concat command
+#define AUTHORS "Cyril John Magayaga"
+
 void print_file(const char* filename, int show_line_numbers, int number_nonblank, int show_nonprinting, int show_tabs, int case_insensitive, int nl_format, int body_numbering, int header_numbering, int footer_numbering, int join_blank_lines, int line_number_interval, const char* line_number_separator, int line_number_width) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -34,42 +43,42 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
                     }
                 }
 		
-		else {
+		        else {
                     line_number++;
                 }
             }
-	    
-	    else {
+            
+            else {
                 blank_line_count = 0;
             }
-
+            
             if ((line_number % line_number_interval == 0) && !is_blank_line) {
                 printf("%*d%s", line_number_width, line_number, line_number_separator);
             }
-	    
-	    else if (is_blank_line && (body_numbering == 1)) {
+            
+            else if (is_blank_line && (body_numbering == 1)) {
                 printf("%*d%s", line_number_width, line_number, line_number_separator);
             }
-	    
-	    else if (is_blank_line && (body_numbering == 2)) {
+            
+            else if (is_blank_line && (body_numbering == 2)) {
                 printf("%*d%s", line_number_width, line_number++, line_number_separator);
             }
-	    
-	    else if (!is_blank_line) {
+            
+            else if (!is_blank_line) {
                 printf("%*d%s", line_number_width, line_number++, line_number_separator);
             }
-	    
-	    else {
+            
+            else {
                 printf("%*s%s", line_number_width, "", line_number_separator);
             }
         }
-	
-	else {
+        
+        else {
             if (show_line_numbers) {
                 printf("%6d\t", line_number++);
             }
-	    
-	    else if (number_nonblank && !is_blank_line) {
+            
+            else if (number_nonblank && !is_blank_line) {
                 printf("%6d\t", nonblank_line_number++);
             }
         }
@@ -81,29 +90,29 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
                     case '\n':
                         printf("$\n");
                         break;
-                    
-		    case '\t':
+                        
+                    case '\t':
                         if (show_tabs) {
                             printf("^I");
                         }
-			
-			else {
+                        
+                        else {
                             putchar(buffer[i]);
                         }
                         break;
                     
-		    default:
+                    default:
                         printf("\\x%02X", buffer[i] & 0xFF);
                         break;
                 }
             }
-	    
-	    else {
+            
+            else {
                 if (case_insensitive && buffer[i] >= 'A' && buffer[i] <= 'Z') {
                     putchar(buffer[i] + 32);
                 }
-		
-		else {
+                
+                else {
                     putchar(buffer[i]);
                 }
             }
@@ -120,7 +129,7 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
 
 void display_version() {
     blue();
-    printf("Concat command (v1.1.1)\n");
+    printf("%s command (%s)\n", PROGRAM_NAME, VERSION);
     resetColor();
 }
 
@@ -128,7 +137,7 @@ void display_help() {
     yellow();
     printf("Usage: ");
     resetColor();
-    printf("concat [OPTION]... [FILE]...\n");
+    printf("%s [OPTION]... [FILE]...\n", PROGRAM_NAME);
     printf("Concatenate FILE(s) and display the content on the standard output.\n\n");
     printf("  -A, --show-all                         equivalent to -e -t -n\n");
     printf("  -b, --number-nonblank                  number nonempty output lines, overrides -n\n");
@@ -154,7 +163,7 @@ int main(int argc, char* argv[]) {
         yellow();
         printf("Usage: ");
         resetColor();
-        printf("concat [OPTION]... [FILE]...\n");
+        printf("%s [OPTION]... [FILE]...\n", PROGRAM_NAME);
         return 1;
     }
 
@@ -177,126 +186,128 @@ int main(int argc, char* argv[]) {
             display_help();
             return 0;
         }
-	
-	else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+        
+        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             blue();
-            printf("\nConcat (v1.1.1) was created and developed by Cyril John Magayaga\n");
+            printf("%s (%s) was created and developed by %s\n", PROGRAM_NAME, VERSION, AUTHORS);
             resetColor();
-            printf("\nCopyright (c) 2023-2024 Cyril John Magayaga");
+            printf("\nCopyright (c) 2023-2024 %s", AUTHORS);
             printf("\nTagline: Command-based utility that reads files sequentially, writing them to standard output!\n");
             return 0;
         }
-	
-	else if (strcmp(argv[i], "-A") == 0) {
+        
+        else if (strcmp(argv[i], "-A") == 0) {
             show_line_numbers = 1;
             show_nonprinting = 1;
             show_tabs = 1;
         }
-	
-	else if (strcmp(argv[i], "-b") == 0) {
+        
+        else if (strcmp(argv[i], "-b") == 0) {
             number_nonblank = 1;
         }
-	
-	else if (strcmp(argv[i], "-e") == 0) {
+        
+        else if (strcmp(argv[i], "-e") == 0) {
             show_nonprinting = 1;
         }
-	
-	else if (strcmp(argv[i], "-n") == 0) {
+        
+        else if (strcmp(argv[i], "-n") == 0) {
             show_line_numbers = 1;
             number_nonblank = 0;
         }
-	
-	else if (strcmp(argv[i], "-t") == 0) {
+        
+        else if (strcmp(argv[i], "-t") == 0) {
             show_tabs = 1;
         }
-	
-	else if (strcmp(argv[i], "-u") == 0) {
+        
+        else if (strcmp(argv[i], "-u") == 0) {
             // Ignored
         }
-	
-	else if (strcmp(argv[i], "--show-nonprinting") == 0) {
+        
+        else if (strcmp(argv[i], "--show-nonprinting") == 0) {
             show_nonprinting = 1;
         }
-	
-	else if (strcmp(argv[i], "-i") == 0) {
+        
+        else if (strcmp(argv[i], "-i") == 0) {
             case_insensitive = 1;
         }
-	
-	else if (strcmp(argv[i], "--nl") == 0) {
+        
+        else if (strcmp(argv[i], "--nl") == 0) {
             nl_format = 1;
         }
-	
-	else if (strcmp(argv[i], "--body-numbering") == 0 || strcmp(argv[i], "-b") == 0) {
+        
+        else if (strcmp(argv[i], "--body-numbering") == 0 || strcmp(argv[i], "-b") == 0) {
             if (++i < argc) {
                 if (strcmp(argv[i], "a") == 0) {
                     body_numbering = 1;
                 }
-		
-		else if (strcmp(argv[i], "t") == 0) {
+                
+                else if (strcmp(argv[i], "t") == 0) {
                     body_numbering = 2;
                 }
-		
-		else {
+                
+                else {
                     body_numbering = 0;
                 }
             }
         }
-	
-	else if (strcmp(argv[i], "--header-numbering") == 0 || strcmp(argv[i], "-h") == 0) {
+        
+        else if (strcmp(argv[i], "--header-numbering") == 0 || strcmp(argv[i], "-h") == 0) {
             if (++i < argc) {
                 if (strcmp(argv[i], "a") == 0) {
                     header_numbering = 1;
                 }
-		
-		else if (strcmp(argv[i], "t") == 0) {
+                
+                else if (strcmp(argv[i], "t") == 0) {
                     header_numbering = 2;
                 }
-		
-		else {
+                
+                else {
                     header_numbering = 0;
                 }
             }
         }
-	
-	else if (strcmp(argv[i], "--footer-numbering") == 0 || strcmp(argv[i], "-f") == 0) {
+        
+        else if (strcmp(argv[i], "--footer-numbering") == 0 || strcmp(argv[i], "-f") == 0) {
             if (++i < argc) {
                 if (strcmp(argv[i], "a") == 0) {
                     footer_numbering = 1;
                 }
-		
-		else if (strcmp(argv[i], "t") == 0) {
+                
+                else if (strcmp(argv[i], "t") == 0) {
                     footer_numbering = 2;
                 }
-		
-		else {
+                
+                else {
                     footer_numbering = 0;
                 }
             }
         }
-	
-	else if (strcmp(argv[i], "--join-blank-lines") == 0 || strcmp(argv[i], "-i") == 0) {
+        
+        else if (strcmp(argv[i], "--join-blank-lines") == 0 || strcmp(argv[i], "-i") == 0) {
             if (++i < argc) {
                 join_blank_lines = atoi(argv[i]);
             }
         }
-	
-	else if (strcmp(argv[i], "--line-number-interval") == 0 || strcmp(argv[i], "-l") == 0) {
+        
+        else if (strcmp(argv[i], "--line-number-interval") == 0 || strcmp(argv[i], "-l") == 0) {
             if (++i < argc) {
                 line_number_interval = atoi(argv[i]);
             }
-        } else if (strcmp(argv[i], "--number-separator") == 0 || strcmp(argv[i], "-s") == 0) {
+        }
+        
+        else if (strcmp(argv[i], "--number-separator") == 0 || strcmp(argv[i], "-s") == 0) {
             if (++i < argc) {
                 line_number_separator = argv[i];
             }
         }
-	
-	else if (strcmp(argv[i], "--line-number-width") == 0 || strcmp(argv[i], "-w") == 0) {
+        
+        else if (strcmp(argv[i], "--line-number-width") == 0 || strcmp(argv[i], "-w") == 0) {
             if (++i < argc) {
                 line_number_width = atoi(argv[i]);
             }
         }
-	
-	else if (strcmp(argv[i], ">") == 0) {
+        
+        else if (strcmp(argv[i], ">") == 0) {
             if (i + 1 >= argc) {
                 red();
                 printf("Error: ");
@@ -309,8 +320,8 @@ int main(int argc, char* argv[]) {
             freopen(argv[i + 1], "w", stdout);
             i++;
         }
-	
-	else if (strcmp(argv[i], ">>") == 0) {
+        
+        else if (strcmp(argv[i], ">>") == 0) {
             if (i + 1 >= argc) {
                 red();
                 printf("Error: ");
@@ -323,11 +334,11 @@ int main(int argc, char* argv[]) {
             freopen(argv[i + 1], "a", stdout);
             i++;
         }
-	
-	else if (argv[i][0] != '-') {
+        
+        else if (argv[i][0] != '-') {
             print_file(argv[i], show_line_numbers, number_nonblank, show_nonprinting, show_tabs, case_insensitive, nl_format, body_numbering, header_numbering, footer_numbering, join_blank_lines, line_number_interval, line_number_separator, line_number_width);
         }
     }
-
+    
     return 0;
 }
