@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <dirent.h>
+#include <ctype.h>
 #include "color.h"
 
 // Program name
@@ -32,8 +32,8 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
     int blank_line_count = 0;
 
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        int is_blank_line = buffer[0] == '\n';
-        
+        int is_blank_line = (buffer[0] == '\n' || buffer[0] == '\r');
+
         if (nl_format) {
             if (is_blank_line) {
                 if (join_blank_lines > 0) {
@@ -43,8 +43,8 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
                         line_number++;
                     }
                 }
-		
-		        else {
+                
+                else {
                     line_number++;
                 }
             }
@@ -52,7 +52,7 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
             else {
                 blank_line_count = 0;
             }
-            
+
             if ((line_number % line_number_interval == 0) && !is_blank_line) {
                 printf("%*d%s", line_number_width, line_number, line_number_separator);
             }
@@ -89,9 +89,9 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
             if (show_nonprinting && (buffer[i] < 32 || buffer[i] > 126)) {
                 switch (buffer[i]) {
                     case '\n':
-                        printf("$\n");
+                        if (!show_nonprinting) putchar('$');
                         break;
-                        
+
                     case '\t':
                         if (show_tabs) {
                             printf("^I");
@@ -101,7 +101,7 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
                             putchar(buffer[i]);
                         }
                         break;
-                    
+
                     default:
                         printf("\\x%02X", buffer[i] & 0xFF);
                         break;
@@ -109,8 +109,8 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
             }
             
             else {
-                if (case_insensitive && buffer[i] >= 'A' && buffer[i] <= 'Z') {
-                    putchar(buffer[i] + 32);
+                if (case_insensitive && isupper(buffer[i])) {
+                    putchar(tolower(buffer[i]));
                 }
                 
                 else {
@@ -130,43 +130,150 @@ void print_file(const char* filename, int show_line_numbers, int number_nonblank
 
 void display_version() {
     blue();
-    printf("%s (%s) was created and developed by %s\n", PROGRAM_NAME, VERSION, AUTHORS);
+    printf("%s (%s)\n", PROGRAM_NAME, VERSION);
     resetColor();
-    printf("\nCopyright (c) 2023-2024 %s", AUTHORS);
+    printf("Copyright (c) 2023-2024 %s", AUTHORS);
     printf("\nTagline: Command-based utility that reads files sequentially, writing them to standard output!\n");
 }
 
 void display_help() {
+    const char* help_message =
+        "Concatenate FILE(s), Numbering LINE(s), and display the content on the standard output.\n\n"
+        "Options:\n"
+        "  -A,  --show-all                        Equivalent to -e -t -n\n"
+        "  -b,  --number-nonblank                 Number nonempty output lines, overrides -n\n"
+        "  -e                                     Display non-printing characters with $ at the end of each line\n"
+        "  -n,  --number                          Number all output lines\n"
+        "  -t                                     Display TAB characters as ^I\n"
+        "  -u                                     (ignored)\n"
+        "       --show-nonprinting                Show non-printing characters (use escape sequences)\n"
+        "  -v,  --version                         Display version information\n"
+        "  -dv, --dumpversion                     Display the version of the compiler\n"
+        "       --help                            Display this help and exit\n"
+        "       --help=[options]                  Display help information for specific options instead of the entire help menu\n"
+        "       --nl                              Number lines like the nl command with additional options:\n"
+        "           -b, --body-numbering          Specify numbering for body (default: t, a, n)\n"
+        "           -h, --header-numbering        Specify numbering for header (default: a, n)\n"
+        "           -f, --footer-numbering        Specify numbering for footer (default: a, n)\n"
+        "           -i, --join-blank-lines        Specify the number of blank lines to be joined\n"
+        "           -l, --line-number-interval    Specify the interval between line numbers\n"
+        "           -s, --number-separator        Specify the separator to use between line numbers and lines\n"
+        "           -w, --line-number-width       Specify the width of the line numbers\n"
+        "      --repl                             enter REPL (Read-Eval-Print Loop) mode\n\n"
+        "Examples:\n"
+        "  concat                                 Copy standard input to standard output.\n";
+
     yellow();
     printf("Usage: ");
     resetColor();
     printf("%s [OPTION]... [FILE]...\n", PROGRAM_NAME);
-    printf("Concatenate FILE(s), Numbering LINE(s), and display the content on the standard output.\n\n");
-    printf("  -A,  --show-all                        Equivalent to -e -t -n\n");
-    printf("  -b,  --number-nonblank                 Number nonempty output lines, overrides -n\n");
-    printf("  -e                                     Display non-printing characters with $ at the end of each line\n");
-    printf("  -n,  --number                          Number all output lines\n");
-    printf("  -t                                     Display TAB characters as ^I\n");
-    printf("  -u                                     (ignored)\n");
-    printf("       --show-nonprinting                Show non-printing characters (use escape sequences)\n");
-    printf("  -v,  --version                         Display version information\n");
-    printf("  -dv, --dumpversion                     Display the version of the compiler\n");
-    printf("      --help                             Display this help and exit\n");
-    printf("      --nl                               Number lines like the nl command with additional options:\n");
-    printf("           -b, --body-numbering          Specify numbering for body (default: t, a, n)\n");
-    printf("           -h, --header-numbering        Specify numbering for header (default: a, n)\n");
-    printf("           -f, --footer-numbering        Specify numbering for footer (default: a, n)\n");
-    printf("           -i, --join-blank-lines        Specify the number of blank lines to be joined\n");
-    printf("           -l, --line-number-interval    Specify the interval between line numbers\n");
-    printf("           -s, --number-separator        Specify the separator to use between line numbers and lines\n");
-    printf("           -w, --line-number-width       Specify the width of the line numbers\n");
-    printf("      --repl                             enter REPL (Read-Eval-Print Loop) mode\n");
+    fputs(help_message, stdout);
     printf("For bug reporting instructions, please see: ");
     blue();
     printf("<https://github.com/magayaga/concat>");
-    resetColor();
-    printf("\n");
 }
+
+void show_specific_help(const char* option) {
+    if (strcmp(option, "-A") == 0 || strcmp(option, "--show-all") == 0) {
+        yellow();
+        fputs("  -A,  --show-all                        ", stdout);
+        resetColor();
+        fputs("Equivalent to -e -t -n\n", stdout);
+    } 
+    
+    else if (strcmp(option, "-b") == 0 || strcmp(option, "--number-nonblank") == 0) {
+        yellow();
+        fputs("  -b,  --number-nonblank                 ", stdout);
+        resetColor();
+        fputs("Number nonempty output lines, overrides -n\n", stdout);
+    }
+    
+    else if (strcmp(option, "-e") == 0) {
+        yellow();
+        fputs("  -e                                     ", stdout);
+        resetColor();
+        fputs("Display non-printing characters with $ at the end of each line\n", stdout);
+    }
+    
+    else if (strcmp(option, "-n") == 0 || strcmp(option, "--number") == 0) {
+        yellow();
+        fputs("  -n,  --number                          ", stdout);
+        resetColor();
+        fputs("Number all output lines\n", stdout);
+    }
+    
+    else if (strcmp(option, "-t") == 0) {
+        yellow();
+        fputs("  -t                                     ", stdout);
+        resetColor();
+        fputs("Display TAB characters as ^I\n", stdout);
+    }
+    
+    else if (strcmp(option, "-u") == 0) {
+        yellow();
+        fputs("  -u                                     ", stdout);
+        resetColor();
+        fputs("(ignored)\n", stdout);
+    }
+    
+    else if (strcmp(option, "--show-nonprinting") == 0) {
+        yellow();
+        fputs("       --show-nonprinting                ", stdout);
+        resetColor();
+        fputs("Show non-printing characters (use escape sequences)\n", stdout);
+    }
+    
+    else if (strcmp(option, "-v") == 0 || strcmp(option, "--version") == 0) {
+        yellow();
+        fputs("  -v,  --version                         ", stdout);
+        resetColor();
+        fputs("Display version information\n", stdout);
+    }
+    
+    else if (strcmp(option, "--dumpversion") == 0 || strcmp(option, "-dv") == 0) {
+        yellow();
+        fputs("  -dv, --dumpversion                     ", stdout);
+        resetColor();
+        fputs("Display the version of the compiler\n", stdout);
+    }
+    
+    else if (strcmp(option, "--help") == 0) {
+        yellow();
+        fputs("      --help                             ", stdout);
+        resetColor();
+        fputs("Display this help and exit\n", stdout);
+    }
+    
+    else if (strcmp(option, "--nl") == 0) {
+        yellow();
+        fputs("      --nl                               ",stdout);
+        resetColor();
+        fputs("Number lines like the nl command with additional options:\n", stdout);
+        fputs("           -b, --body-numbering          Specify numbering for body (default: t, a, n)\n", stdout);
+        fputs("           -h, --header-numbering        Specify numbering for header (default: a, n)\n", stdout);
+        fputs("           -f, --footer-numbering        Specify numbering for footer (default: a, n)\n", stdout);
+        fputs("           -i, --join-blank-lines        Specify the number of blank lines to be joined\n", stdout);
+        fputs("           -l, --line-number-interval    Specify the interval between line numbers\n", stdout);
+        fputs("           -s, --number-separator        Specify the separator to use between line numbers and lines\n", stdout);
+        fputs("           -w, --line-number-width       Specify the width of the line numbers\n", stdout);
+    }
+    
+    else if (strcmp(option, "--repl") == 0) {
+        yellow();
+        fputs("      --repl                             ", stdout);
+        resetColor();
+        fputs("enter REPL (Read-Eval-Print Loop) mode\n", stdout);
+    }
+    
+    else {
+        yellow();
+        fputs("Error: ", stdout);
+        resetColor();
+        fputs("Unknown option.\n", stdout);
+        display_help(); // Optionally display the full help menu
+    }
+}
+
 
 void repl() {
     printf("Entering REPL (Read-Eval-Print Loop) mode. Type 'exit' to leave.\n");
@@ -246,51 +353,45 @@ int main(int argc, char* argv[]) {
             display_help();
             return 0;
         }
+
+        else if (strncmp(argv[i], "--help=", 7) == 0) {
+            char *token = strtok(argv[i] + 7, ", ");
+            while (token != NULL) {
+                show_specific_help(token);
+                token = strtok(NULL, ", ");
+            }
+            return 0;
+        } 
         
         else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
             display_version();
             return 0;
         }
-
-        else if (strcmp(argv[i], "--dumpversion") == 0 || strcmp(argv[i], "-dv") == 0) {
-            blue();
-            printf("%s\n", VERSION);
-            resetColor();
+        
+        else if (strcmp(argv[i], "--repl") == 0) {
+            repl();
             return 0;
         }
         
-        else if (strcmp(argv[i], "-A") == 0) {
-            show_line_numbers = 1;
+        else if (strcmp(argv[i], "--show-all") == 0) {
             show_nonprinting = 1;
             show_tabs = 1;
+            show_line_numbers = 1;
         }
         
-        else if (strcmp(argv[i], "-b") == 0) {
+        else if (strcmp(argv[i], "--number-nonblank") == 0) {
             number_nonblank = 1;
-        }
-        
-        else if (strcmp(argv[i], "-e") == 0) {
-            show_nonprinting = 1;
-        }
-        
-        else if (strcmp(argv[i], "-n") == 0) {
-            show_line_numbers = 1;
-            number_nonblank = 0;
-        }
-        
-        else if (strcmp(argv[i], "-t") == 0) {
-            show_tabs = 1;
-        }
-        
-        else if (strcmp(argv[i], "-u") == 0) {
-            // Ignored
         }
         
         else if (strcmp(argv[i], "--show-nonprinting") == 0) {
             show_nonprinting = 1;
         }
         
-        else if (strcmp(argv[i], "-i") == 0) {
+        else if (strcmp(argv[i], "--show-tabs") == 0) {
+            show_tabs = 1;
+        }
+        
+        else if (strcmp(argv[i], "--case-insensitive") == 0) {
             case_insensitive = 1;
         }
         
@@ -298,115 +399,93 @@ int main(int argc, char* argv[]) {
             nl_format = 1;
         }
         
-        else if (strcmp(argv[i], "--body-numbering") == 0 || strcmp(argv[i], "-b") == 0) {
-            if (++i < argc) {
-                if (strcmp(argv[i], "a") == 0) {
-                    body_numbering = 1;
-                }
-                
-                else if (strcmp(argv[i], "t") == 0) {
-                    body_numbering = 2;
-                }
-                
-                else {
-                    body_numbering = 0;
-                }
+        else if (strcmp(argv[i], "--body-numbering") == 0) {
+            if (i + 1 < argc) {
+                body_numbering = atoi(argv[++i]);
             }
-        }
-        
-        else if (strcmp(argv[i], "--header-numbering") == 0 || strcmp(argv[i], "-h") == 0) {
-            if (++i < argc) {
-                if (strcmp(argv[i], "a") == 0) {
-                    header_numbering = 1;
-                }
-                
-                else if (strcmp(argv[i], "t") == 0) {
-                    header_numbering = 2;
-                }
-                
-                else {
-                    header_numbering = 0;
-                }
-            }
-        }
-        
-        else if (strcmp(argv[i], "--footer-numbering") == 0 || strcmp(argv[i], "-f") == 0) {
-            if (++i < argc) {
-                if (strcmp(argv[i], "a") == 0) {
-                    footer_numbering = 1;
-                }
-                
-                else if (strcmp(argv[i], "t") == 0) {
-                    footer_numbering = 2;
-                }
-                
-                else {
-                    footer_numbering = 0;
-                }
-            }
-        }
-        
-        else if (strcmp(argv[i], "--join-blank-lines") == 0 || strcmp(argv[i], "-i") == 0) {
-            if (++i < argc) {
-                join_blank_lines = atoi(argv[i]);
-            }
-        }
-        
-        else if (strcmp(argv[i], "--line-number-interval") == 0 || strcmp(argv[i], "-l") == 0) {
-            if (++i < argc) {
-                line_number_interval = atoi(argv[i]);
-            }
-        }
-        
-        else if (strcmp(argv[i], "--number-separator") == 0 || strcmp(argv[i], "-s") == 0) {
-            if (++i < argc) {
-                line_number_separator = argv[i];
-            }
-        }
-        
-        else if (strcmp(argv[i], "--line-number-width") == 0 || strcmp(argv[i], "-w") == 0) {
-            if (++i < argc) {
-                line_number_width = atoi(argv[i]);
-            }
-        }
-
-        else if (strcmp(argv[i], "--repl") == 0) {
-            repl();
-            return 0;
-        }
-        
-        else if (strcmp(argv[i], ">") == 0) {
-            if (i + 1 >= argc) {
-                red();
-                printf("Error: ");
-                resetColor();
-                yellow();
-                printf("Missing filename after '>'.\n");
-                resetColor();
+            
+            else {
+                fprintf(stderr, "Error: --body-numbering requires an argument.\n");
                 return 1;
             }
-            freopen(argv[i + 1], "w", stdout);
-            i++;
         }
         
-        else if (strcmp(argv[i], ">>") == 0) {
-            if (i + 1 >= argc) {
-                red();
-                printf("Error: ");
-                resetColor();
-                yellow();
-                printf("Missing filename after '>>'.\n");
-                resetColor();
+        else if (strcmp(argv[i], "--header-numbering") == 0) {
+            if (i + 1 < argc) {
+                header_numbering = atoi(argv[++i]);
+            }
+            
+            else {
+                fprintf(stderr, "Error: --header-numbering requires an argument.\n");
                 return 1;
             }
-            freopen(argv[i + 1], "a", stdout);
-            i++;
         }
         
-        else if (argv[i][0] != '-') {
+        else if (strcmp(argv[i], "--footer-numbering") == 0) {
+            if (i + 1 < argc) {
+                footer_numbering = atoi(argv[++i]);
+            }
+            
+            else {
+                fprintf(stderr, "Error: --footer-numbering requires an argument.\n");
+                return 1;
+            }
+        }
+        
+        else if (strcmp(argv[i], "--join-blank-lines") == 0) {
+            if (i + 1 < argc) {
+                join_blank_lines = atoi(argv[++i]);
+            }
+            
+            else {
+                fprintf(stderr, "Error: --join-blank-lines requires an argument.\n");
+                return 1;
+            }
+        }
+        
+        else if (strcmp(argv[i], "--line-number-interval") == 0) {
+            if (i + 1 < argc) {
+                line_number_interval = atoi(argv[++i]);
+            }
+            
+            else {
+                fprintf(stderr, "Error: --line-number-interval requires an argument.\n");
+                return 1;
+            }
+        }
+        
+        else if (strcmp(argv[i], "--number-separator") == 0) {
+            if (i + 1 < argc) {
+                line_number_separator = argv[++i];
+            }
+            
+            else {
+                fprintf(stderr, "Error: --number-separator requires an argument.\n");
+                return 1;
+            }
+        }
+        
+        else if (strcmp(argv[i], "--line-number-width") == 0) {
+            if (i + 1 < argc) {
+                line_number_width = atoi(argv[++i]);
+            }
+            
+            else {
+                fprintf(stderr, "Error: --line-number-width requires an argument.\n");
+                return 1;
+            }
+        }
+        
+        else if (argv[i][0] == '-') {
+            fprintf(stderr, "Error: Unknown option %s\n", argv[i]);
+            return 1;
+        }
+        
+        else {
+            // Treat remaining arguments as filenames
             print_file(argv[i], show_line_numbers, number_nonblank, show_nonprinting, show_tabs, case_insensitive, nl_format, body_numbering, header_numbering, footer_numbering, join_blank_lines, line_number_interval, line_number_separator, line_number_width);
         }
     }
-    
+
     return 0;
 }
